@@ -6,6 +6,9 @@
 ![Download](https://img.shields.io/github/downloads/hrntsm/STBReader/total)
 
 This is a C# class library for reading ST-Bridge data.
+The documentation for this library can be found at the following link.
+
+[STBReader SDK documents](https://hrntsm.github.io/STBReader/html/43ddb667-8661-561f-50f5-84c8e4e1a459.htm)
 
 ## Use cases
 
