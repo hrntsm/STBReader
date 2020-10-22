@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using STBReader.Member;
 using STBReader.Model;
@@ -8,57 +9,57 @@ namespace STBReader
 {
     public class StbData
     {
-        public readonly string Path;
-        public readonly double ToleLength;
-        public readonly double ToleAngle;
+        private readonly double _toleLength;
+        private readonly double _toleAngle;
 
-        public string Xmlns;
-        public StbVersion Version;
-        public StbNodes Nodes;
-        public StbColumns Columns;
-        public StbPosts Posts;
-        public StbGirders Girders;
-        public StbBeams Beams;
-        public StbBraces Braces;
-        public StbSlabs Slabs;
-        public StbWalls Walls;
-        
-        public StbSecColumnRc SecColumnRc;
-        public StbSecBeamRc SecBeamRc;
-        public StbSecColumnS SecColumnS;
-        public StbSecBeamS SecBeamS;
-        public StbSecBraceS SecBraceS;
-        public StbSecSteel SecSteel;
+        private readonly string _xmlns;
+        private readonly StbVersion _version;
+        private StbNodes _nodes;
+        private StbColumns _columns;
+        private StbPosts _posts;
+        private StbGirders _girders;
+        private StbBeams _beams;
+        private StbBraces _braces;
+        private StbSlabs _slabs;
+        private StbWalls _walls;
+
+        private StbSecColumnRc _secColumnRc;
+        private StbSecBeamRc _secBeamRc;
+        private StbSecColumnS _secColumnS;
+        private StbSecBeamS _secBeamS;
+        private StbSecBraceS _secBraceS;
+        private StbSecSteel _secSteel;
 
         public StbData(string path, double toleLength, double toleAngle)
         {
-            Path = path;
-            ToleLength = toleLength;
-            ToleAngle = toleAngle;
+            _toleLength = toleLength;
+            _toleAngle = toleAngle;
             
-            var xDocument = XDocument.Load(Path);
+            XDocument xDocument = XDocument.Load(path);
 
-            var root = xDocument.Root;
+            XElement root = xDocument.Root;
             if (root != null)
             {
                 if (root.Attribute("xmlns") != null)
                 {
-                    Xmlns = "{" + (string)root.Attribute("xmlns") + "}";
+                    _xmlns = "{" + (string)root.Attribute("xmlns") + "}";
                 }
                 else
                 {
-                    Xmlns = string.Empty;
+                    _xmlns = string.Empty;
                 }
 
                 var tmp = (string) root.Attribute("version");
                 switch (tmp.Split('.')[0])
                 {
                     case "1":
-                        Version = StbVersion.Ver1;
+                        _version = StbVersion.Ver1;
                         break;
                     case "2":
-                        Version = StbVersion.Ver2;
+                        _version = StbVersion.Ver2;
                         break;
+                    default:
+                        throw new Exception("The STB version is not set");
                 }
             }
             Init();
@@ -67,34 +68,34 @@ namespace STBReader
         
         private void Init()
         {
-            Nodes = new StbNodes();
-            Columns = new StbColumns();
-            Posts = new StbPosts();
-            Girders = new StbGirders();
-            Beams = new StbBeams();
-            Braces = new StbBraces();
-            Slabs = new StbSlabs();
-            Walls = new StbWalls();
-            SecColumnRc = new StbSecColumnRc();
-            SecBeamRc = new StbSecBeamRc();
-            SecColumnS = new StbSecColumnS();
-            SecBeamS = new StbSecBeamS();
-            SecBraceS = new StbSecBraceS();
-            SecSteel = new StbSecSteel();
+            _nodes = new StbNodes();
+            _columns = new StbColumns();
+            _posts = new StbPosts();
+            _girders = new StbGirders();
+            _beams = new StbBeams();
+            _braces = new StbBraces();
+            _slabs = new StbSlabs();
+            _walls = new StbWalls();
+            _secColumnRc = new StbSecColumnRc();
+            _secBeamRc = new StbSecBeamRc();
+            _secColumnS = new StbSecColumnS();
+            _secBeamS = new StbSecBeamS();
+            _secBraceS = new StbSecBraceS();
+            _secSteel = new StbSecSteel();
         }
         
         private void Load(XDocument xDoc)
         {
-            var members = new List<IStbLoader>()
+            var members = new List<IStbLoader>
             {
-                Nodes, Slabs, Walls,
-                Columns, Posts, Girders, Beams, Braces,
-                SecColumnRc, SecColumnS, SecBeamRc, SecBeamS, SecBraceS, SecSteel
+                _nodes, _slabs, _walls,
+                _columns, _posts, _girders, _beams, _braces,
+                _secColumnRc, _secColumnS, _secBeamRc, _secBeamS, _secBraceS, _secSteel
             };
 
-            foreach (var member in members)
+            foreach (IStbLoader member in members)
             {
-                member.Load(xDoc, Version, Xmlns);
+                member.Load(xDoc, _version, _xmlns);
             }
         }
         
