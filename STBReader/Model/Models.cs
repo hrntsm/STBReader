@@ -16,7 +16,7 @@ namespace STBReader.Model
         public List<double> X { get; } = new List<double>();
         public List<double> Y { get; } = new List<double>();
         public List<double> Z { get; } = new List<double>();
-        public List<Point> Pt { get; } = new List<Point>();
+        public List<Point3> Pt { get; } = new List<Point3>();
         public List<KindsNode> Kind { get; } = new List<KindsNode>();
         public List<int> IdMember { get; } = new List<int>();
 
@@ -43,14 +43,18 @@ namespace STBReader.Model
                 X.Add(posX);
                 Y.Add(posY);
                 Z.Add(posZ);
-                Pt.Add(new Point(posX, posY, posZ));
+                Pt.Add(new Point3(posX, posY, posZ));
                 
                 // 必須ではないコード
                 if (stbElem.Attribute("id_member") != null)
+                {
                     IdMember.Add((int)stbElem.Attribute("id_member"));
+                }
                 else
+                {
                     IdMember.Add(-1);
-                
+                }
+
                 // ver2 から必須
                 switch ((string)stbElem.Attribute("kind"))
                 {
@@ -86,17 +90,25 @@ namespace STBReader.Model
             switch (stbVersion)
             {
                 case StbVersion.Ver1:
-                    var xNodeIds = stbElem.Element("StbNodeid_List")?.Elements("StbNodeid");
+                    IEnumerable<XElement> xNodeIds = stbElem.Element("StbNodeid_List")?.Elements("StbNodeid");
                     if (xNodeIds != null)
-                        foreach (var xNodeId in xNodeIds)
+                    {
+                        foreach (XElement xNodeId in xNodeIds)
+                        {
                             IdList.Add((int) xNodeId.Attribute("id"));
+                        }
+                    }
                     break;
                 case StbVersion.Ver2:
-                    var xNodeIdOrders = stbElem.Value;
-                    var nodeList = xNodeIdOrders.Split(' ').ToList();
-                    foreach (var node in nodeList)
+                    string xNodeIdOrders = stbElem.Value;
+                    List<string> nodeList = xNodeIdOrders.Split(' ').ToList();
+                    foreach (string node in nodeList)
+                    {
                         IdList.Add(int.Parse(node));
+                    }
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(stbVersion), stbVersion, "The STB version is not set");
             }
         }
     }
@@ -152,14 +164,22 @@ namespace STBReader.Model
 
             // 必須ではないコード
             if (stbElem.Attribute("name") != null)
+            {
                 Name.Add((string)stbElem.Attribute("name"));
+            }
             else
+            {
                 Name.Add(string.Empty);
-            
+            }
+
             if (stbElem.Attribute("concrete_strength") != null)
+            {
                 StrengthConcrete.Add((string)stbElem.Attribute("concrete_strength"));
+            }
             else
+            {
                 StrengthConcrete.Add(string.Empty);
+            }
         }
     }
 

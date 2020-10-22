@@ -45,11 +45,15 @@ namespace STBReader.Member
         protected override void ElementLoader(XElement stbElem, StbVersion version, string xmlns)
         {
             base.ElementLoader(stbElem, version, xmlns);
-            
-            if (stbElem.Attribute("rotate") != null)
-                Rotate.Add((double) stbElem.Attribute("rotate"));
-            else
+
+            if (stbElem.Attribute("rotate") == null)
+            {
                 Rotate.Add(0d);
+            }
+            else
+            {
+                Rotate.Add((double) stbElem.Attribute("rotate"));
+            }
         }
     }
 

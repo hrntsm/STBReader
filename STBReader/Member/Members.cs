@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using static STBReader.StbData;
@@ -22,6 +23,8 @@ namespace STBReader.Member
                     IdNodeStart.Add((int) stbElem.Attribute("id_node_bottom"));
                     IdNodeEnd.Add((int) stbElem.Attribute("id_node_top"));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -47,6 +50,8 @@ namespace STBReader.Member
                     IdNodeStart.Add((int) stbElem.Attribute("id_node_bottom"));
                     IdNodeEnd.Add((int) stbElem.Attribute("id_node_top"));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -73,12 +78,18 @@ namespace STBReader.Member
                     IdNodeStart.Add((int)stbElem.Attribute("id_node_start"));
                     IdNodeEnd.Add((int)stbElem.Attribute("id_node_end"));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
 
             if (stbElem.Attribute("level") != null)
+            {
                 Level.Add((double)stbElem.Attribute("level"));
+            }
             else
+            {
                 Level.Add(0d);
+            }
         }
     }
 
@@ -104,12 +115,18 @@ namespace STBReader.Member
                     IdNodeStart.Add((int)stbElem.Attribute("id_node_start"));
                     IdNodeEnd.Add((int)stbElem.Attribute("id_node_end"));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
 
             if (stbElem.Attribute("level") != null)
+            {
                 Level.Add((double)stbElem.Attribute("level"));
+            }
             else
+            {
                 Level.Add(0d);
+            }
         }
     }
 
@@ -134,6 +151,8 @@ namespace STBReader.Member
                     IdNodeStart.Add((int)stbElem.Attribute("id_node_start"));
                     IdNodeEnd.Add((int)stbElem.Attribute("id_node_end"));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -157,9 +176,13 @@ namespace STBReader.Member
         {
             base.ElementLoader(stbElem, version, xmlns);
             if (stbElem.Attribute("level") != null)
+            {
                 Level.Add((double)stbElem.Attribute("level"));
+            }
             else
+            {
                 Level.Add(0d);
+            }
         }
     }
 
@@ -217,18 +240,26 @@ namespace STBReader.Member
             switch (version)
             {
                 case StbVersion.Ver1:
-                    var xOpens = stbElem.Elements("StbOpen");
-                    foreach (var xOpen in xOpens)
+                    IEnumerable<XElement> xOpens = stbElem.Elements("StbOpen");
+                    foreach (XElement xOpen in xOpens)
                     {
                         if (xOpen.Attribute("id") != null)
+                        {
                             Id.Add((int) xOpen.Attribute("id"));
+                        }
                         else
+                        {
                             Id.Add(0);
+                        }
 
                         if (xOpen.Attribute("name") != null)
+                        {
                             Name.Add((string) xOpen.Attribute("name"));
+                        }
                         else
+                        {
                             Name.Add(string.Empty);
+                        }
 
                         IdSection.Add((int) xOpen.Attribute("id_section"));
                         PositionX.Add((double) xOpen.Attribute("position_X"));
@@ -240,6 +271,8 @@ namespace STBReader.Member
                     break;
                 case StbVersion.Ver2:
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }

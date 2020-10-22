@@ -47,7 +47,8 @@
         /// <summary>
         /// 根巻柱脚
         /// </summary>
-        Wrap
+        Wrap,
+        Any
     }
 
     /// <summary>

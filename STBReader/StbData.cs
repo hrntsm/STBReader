@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using STBReader.Member;
 using STBReader.Model;
@@ -8,12 +9,11 @@ namespace STBReader
 {
     public class StbData
     {
-        public readonly string Path;
         public readonly double ToleLength;
         public readonly double ToleAngle;
 
-        public string Xmlns;
-        public StbVersion Version;
+        private readonly string _xmlns;
+        private readonly StbVersion _version;
         public StbNodes Nodes;
         public StbColumns Columns;
         public StbPosts Posts;
@@ -22,7 +22,7 @@ namespace STBReader
         public StbBraces Braces;
         public StbSlabs Slabs;
         public StbWalls Walls;
-        
+
         public StbSecColumnRc SecColumnRc;
         public StbSecBeamRc SecBeamRc;
         public StbSecColumnS SecColumnS;
@@ -32,37 +32,46 @@ namespace STBReader
 
         public StbData(string path, double toleLength, double toleAngle)
         {
-            Path = path;
             ToleLength = toleLength;
             ToleAngle = toleAngle;
             
-            var xDocument = XDocument.Load(Path);
-
-            var root = xDocument.Root;
-            if (root != null)
+            try
             {
-                if (root.Attribute("xmlns") != null)
-                {
-                    Xmlns = "{" + (string)root.Attribute("xmlns") + "}";
-                }
-                else
-                {
-                    Xmlns = string.Empty;
-                }
+                XDocument xDocument = XDocument.Load(path);
+                XElement root = xDocument.Root;
 
-                var tmp = (string) root.Attribute("version");
-                switch (tmp.Split('.')[0])
+                if (root != null)
                 {
-                    case "1":
-                        Version = StbVersion.Ver1;
-                        break;
-                    case "2":
-                        Version = StbVersion.Ver2;
-                        break;
+                    if (root.Attribute("xmlns") != null)
+                    {
+                        _xmlns = "{" + (string)root.Attribute("xmlns") + "}";
+                    }
+                    else
+                    {
+                        _xmlns = string.Empty;
+                    }
+
+                    var tmp = (string) root.Attribute("version");
+                    switch (tmp.Split('.')[0])
+                    {
+                        case "1":
+                            _version = StbVersion.Ver1;
+                            break;
+                        case "2":
+                            _version = StbVersion.Ver2;
+                            break;
+                        default:
+                            throw new ArgumentException("The STB version is not set");
+                    }
                 }
+                Init();
+                Load(xDocument);
             }
-            Init();
-            Load(xDocument);
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         
         private void Init()
@@ -85,16 +94,16 @@ namespace STBReader
         
         private void Load(XDocument xDoc)
         {
-            var members = new List<IStbLoader>()
+            var members = new List<IStbLoader>
             {
                 Nodes, Slabs, Walls,
                 Columns, Posts, Girders, Beams, Braces,
                 SecColumnRc, SecColumnS, SecBeamRc, SecBeamS, SecBraceS, SecSteel
             };
 
-            foreach (var member in members)
+            foreach (IStbLoader member in members)
             {
-                member.Load(xDoc, Version, Xmlns);
+                member.Load(xDoc, _version, _xmlns);
             }
         }
         

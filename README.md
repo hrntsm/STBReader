@@ -1,9 +1,9 @@
 # STBReader
 
 ![license](https://img.shields.io/github/license/hrntsm/STBReader)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/c10a5f5651d34d0e944b30b8e95dba42)](https://www.codacy.com/gh/hrntsm/STBReader/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=hrntsm/STBReader&amp;utm_campaign=Badge_Grade)
 ![issues](https://img.shields.io/github/issues/hrntsm/STBReader)
 ![Release](https://img.shields.io/github/v/release/hrntsm/STBReader)
-![Download](https://img.shields.io/github/downloads/hrntsm/STBReader/total)
 
 This is a C# class library for reading ST-Bridge data.
 The documentation for this library can be found at the following link.
@@ -14,9 +14,9 @@ The documentation for this library can be found at the following link.
 
 Two software programs have been created that use this library.
 + For Grasshopper in Rhinoceros
-  + [HoaryFox](https://github.com/hrntsm/HoaryFox)
+    + [HoaryFox](https://github.com/hrntsm/HoaryFox)
 + Applications for Windows made with Unity
-  + [STEVIA](https://github.com/hrntsm/STEVIA-Stb2U)
+    + [STEVIA](https://github.com/hrntsm/STEVIA-Stb2U)
 
 ## What is ST-Bridge
 
@@ -30,10 +30,10 @@ Quote from [building SMART Japan Structural Design Subcommittee](https://en.buil
 ## Contact information
 
 [![Twitter](https://img.shields.io/twitter/follow/hiron_rgkr?style=social)](https://twitter.com/hiron_rgkr)
-+ HP : [https://hrntsm.github.io//](https://hrntsm.github.io/)
-+ blog : [https://rgkr-memo.blogspot.com/](https://rgkr-memo.blogspot.com/)
-+ Mail : support(at)hrntsm.com
-  + change (at) to @
+ + HP : [https://hrntsm.github.io//](https://hrntsm.github.io/)
+ + blog : [https://rgkr-memo.blogspot.com/](https://rgkr-memo.blogspot.com/)
+ + Mail : support(at)hrntsm.com
+    + change (at) to @
   
 ## License
 
