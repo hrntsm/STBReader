@@ -35,35 +35,43 @@ namespace STBReader
             ToleLength = toleLength;
             ToleAngle = toleAngle;
             
-            XDocument xDocument = XDocument.Load(path);
-
-            XElement root = xDocument.Root;
-            if (root != null)
+            try
             {
-                if (root.Attribute("xmlns") != null)
-                {
-                    _xmlns = "{" + (string)root.Attribute("xmlns") + "}";
-                }
-                else
-                {
-                    _xmlns = string.Empty;
-                }
+                XDocument xDocument = XDocument.Load(path);
+                XElement root = xDocument.Root;
 
-                var tmp = (string) root.Attribute("version");
-                switch (tmp.Split('.')[0])
+                if (root != null)
                 {
-                    case "1":
-                        _version = StbVersion.Ver1;
-                        break;
-                    case "2":
-                        _version = StbVersion.Ver2;
-                        break;
-                    default:
-                        throw new ArgumentException("The STB version is not set");
+                    if (root.Attribute("xmlns") != null)
+                    {
+                        _xmlns = "{" + (string)root.Attribute("xmlns") + "}";
+                    }
+                    else
+                    {
+                        _xmlns = string.Empty;
+                    }
+
+                    var tmp = (string) root.Attribute("version");
+                    switch (tmp.Split('.')[0])
+                    {
+                        case "1":
+                            _version = StbVersion.Ver1;
+                            break;
+                        case "2":
+                            _version = StbVersion.Ver2;
+                            break;
+                        default:
+                            throw new ArgumentException("The STB version is not set");
+                    }
                 }
+                Init();
+                Load(xDocument);
             }
-            Init();
-            Load(xDocument);
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
         
         private void Init()
