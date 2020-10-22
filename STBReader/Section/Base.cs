@@ -114,7 +114,10 @@ namespace STBReader.Section
 
         public override void Load(XDocument stbData, StbVersion stbVersion, string xmlns)
         {
-            if (stbData.Root == null) return;
+            if (stbData.Root == null)
+            {
+                return;
+            }
 
             IEnumerable<XElement> stSecSteel = stbData.Root.Descendants(xmlns + Tag);
             IEnumerable<XElement> stSections = stSecSteel.Elements(xmlns + ElementTag);

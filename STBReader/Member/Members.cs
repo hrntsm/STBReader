@@ -83,9 +83,13 @@ namespace STBReader.Member
             }
 
             if (stbElem.Attribute("level") != null)
+            {
                 Level.Add((double)stbElem.Attribute("level"));
+            }
             else
+            {
                 Level.Add(0d);
+            }
         }
     }
 
@@ -116,9 +120,13 @@ namespace STBReader.Member
             }
 
             if (stbElem.Attribute("level") != null)
+            {
                 Level.Add((double)stbElem.Attribute("level"));
+            }
             else
+            {
                 Level.Add(0d);
+            }
         }
     }
 
