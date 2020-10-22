@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using static STBReader.StbData;
 
@@ -26,11 +27,13 @@ namespace STBReader
 
         public virtual void Load(XDocument stbFile, StbVersion version, string xmlns)
         {
-            if (stbFile.Root == null) 
+            if (stbFile.Root == null)
+            {
                 return;
-            
-            var stbElems = stbFile.Root.Descendants(xmlns + Tag);
-            foreach (var stbElem in stbElems)
+            }
+
+            IEnumerable<XElement> stbElems = stbFile.Root.Descendants(xmlns + Tag);
+            foreach (XElement stbElem in stbElems)
             {
                 ElementLoader(stbElem, version, xmlns);
             }
@@ -42,17 +45,38 @@ namespace STBReader
         }
     }
 
-    public struct Point
+    public readonly struct Point : IEquatable<Point>
     {
-        public double X { get; }
-        public double Y { get; }
-        public double Z { get; }
+        private double X { get; }
+        private double Y { get; }
+        private double Z { get; }
 
         public Point(double x, double y, double z)
         {
             X = x;
             Y = y;
             Z = z;
+        }
+
+        public bool Equals(Point other)
+        {
+            return X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Point other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hashCode = X.GetHashCode();
+                hashCode = (hashCode * 397) ^ Y.GetHashCode();
+                hashCode = (hashCode * 397) ^ Z.GetHashCode();
+                return hashCode;
+            }
         }
     }
 }

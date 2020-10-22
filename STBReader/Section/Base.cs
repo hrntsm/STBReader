@@ -24,11 +24,15 @@ namespace STBReader.Section
         {
             base.ElementLoader(stbElem, version, xmlns);
             Id.Add((int)stbElem.Attribute("id"));
-            
+
             if (stbElem.Attribute("floor") != null)
+            {
                 Floor.Add((string)stbElem.Attribute("floor"));
+            }
             else
+            {
                 Floor.Add(string.Empty);
+            }
         }
     }
 
@@ -59,6 +63,8 @@ namespace STBReader.Section
                     break;
                 case StbVersion.Ver2:
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, null);
             }
             
             var stbColSecBarArrangement = new StbColSecBarArrangement();
@@ -109,13 +115,17 @@ namespace STBReader.Section
         public override void Load(XDocument stbData, StbVersion stbVersion, string xmlns)
         {
             if (stbData.Root == null)
+            {
                 return;
+            }
 
-            var stSecSteel = stbData.Root.Descendants(xmlns + Tag);
-            var stSections = stSecSteel.Elements(xmlns + ElementTag);
+            IEnumerable<XElement> stSecSteel = stbData.Root.Descendants(xmlns + Tag);
+            IEnumerable<XElement> stSections = stSecSteel.Elements(xmlns + ElementTag);
 
-            foreach (var stSection in stSections)
+            foreach (XElement stSection in stSections)
+            {
                 ElementLoader(stSection, stbVersion, xmlns);
+            }
         }
     }
 }

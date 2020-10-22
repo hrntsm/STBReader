@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Xml.Linq;
 using static STBReader.StbData;
 
@@ -115,6 +116,8 @@ namespace STBReader.Section
                         IsRect = false;
                     }
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -132,9 +135,11 @@ namespace STBReader.Section
             {
                 case StbVersion.Ver1:
                     string elementName;
-                    var stbBar = stbColumn.Element("StbSecBar_Arrangement");
+                    XElement stbBar = stbColumn.Element("StbSecBar_Arrangement");
                     if (stbBar == null)
+                    {
                         break;
+                    }
 
                     if (stbBar.Element("StbSecRect_Column_Same") != null)
                     {
@@ -158,52 +163,92 @@ namespace STBReader.Section
                         return;
                     }
 
-                    var stbBarElem = stbBar.Element(elementName);
+                    XElement stbBarElem = stbBar.Element(elementName);
                     if (stbBarElem == null)
+                    {
                         break;
+                    }
 
                     // Main 1
                     if (stbBarElem.Attribute("count_main_X_1st") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_X_1st"));
+                    }
                     else
+                    {
                         BarList.Add(0);
-                    if (stbBarElem.Attribute("count_main_X_1st") != null)
+                    }
+
+                    if (stbBarElem.Attribute("count_main_Y_1st") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_Y_1st"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Main2
                     if (stbBarElem.Attribute("count_main_X_2nd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_X_2nd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
+
                     if (stbBarElem.Attribute("count_main_Y_2nd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_Y_2nd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Main total
                     if (stbBarElem.Attribute("count_main_total") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_total"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Band
                     if (stbBarElem.Attribute("pitch_band") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("pitch_band"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
+
                     if (stbBarElem.Attribute("count_band_dir_X") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_band_dir_X"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
+
                     if (stbBarElem.Attribute("count_band_dir_Y") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_band_dir_Y"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     break;
                 case StbVersion.Ver2:
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -244,10 +289,12 @@ namespace STBReader.Section
         public override void Load(XDocument stbData, StbVersion version, string xmlns)
         {
             if (stbData.Root == null)
+            {
                 return;
-            
-            var stbStCols = stbData.Root.Descendants(xmlns + Tag);
-            foreach (var stbStCol in stbStCols)
+            }
+
+            IEnumerable<XElement> stbStCols = stbData.Root.Descendants(xmlns + Tag);
+            foreach (XElement stbStCol in stbStCols)
             {
                 // 必須コード
                 Id.Add((int)stbStCol.Attribute("id"));
@@ -264,15 +311,9 @@ namespace STBReader.Section
                 }
                 if (stbStCol.Attribute("kind_column") != null)
                 {
-                    switch ((string)stbStCol.Attribute("kind_column"))
-                    {
-                        case "COLUMN":
-                            KindColumn.Add(KindsColumn.Column);
-                            break;
-                        default:
-                            KindColumn.Add(KindsColumn.Post);
-                            break;
-                    }
+                    KindColumn.Add((string) stbStCol.Attribute("kind_column") == "COLUMN"
+                        ? KindsColumn.Column
+                        : KindsColumn.Post);
                 }
                 else
                 {
@@ -290,6 +331,9 @@ namespace STBReader.Section
                             break;
                         case "WRAP":
                             BaseType.Add(BaseTypes.Wrap);
+                            break;
+                        default:
+                            BaseType.Add(BaseTypes.Any);
                             break;
                     }
                 }
@@ -369,8 +413,10 @@ namespace STBReader.Section
                     string tag;
                     stbFigure = stbStCol.Element(xmlns + "StbSecSteelFigureColumn_S");
                     if (stbFigure == null)
+                    {
                         break;
-                    
+                    }
+
                     if (stbFigure.Element(xmlns + "StbSecSteelColumn_S_Same") != null)
                     {
                         tag = xmlns + "StbSecSteelColumn_S_Same";
@@ -381,20 +427,20 @@ namespace STBReader.Section
                     else if (stbFigure.Element(xmlns + "StbSecSteelColumn_S_NotSame") != null)
                     {
                         tag = xmlns + "StbSecSteelColumn_S_NotSame";
-                        foreach (var elem in stbFigure.Elements(tag))
+                        foreach (XElement elem in stbFigure.Elements(tag))
                         {
-                            if ((string)elem.Attribute("pos") == "BOTTOM")
+                            if ((string) elem.Attribute("pos") == "BOTTOM")
                             {
                                 Pos = "CENTER";
-                                Shape = (string)stbFigure.Element(tag).Attribute("shape");
-                                StrengthMain = (string)stbFigure.Element(tag).Attribute("strength_main");
+                                Shape = (string) stbFigure.Element(tag).Attribute("shape");
+                                StrengthMain = (string) stbFigure.Element(tag).Attribute("strength_main");
                             }
                         }
                     }
                     else if (stbFigure.Element(xmlns + "StbSecSteelColumn_S_ThreeTypes") != null)
                     {
                         tag = xmlns + "StbSecSteelColumn_S_ThreeTypes";
-                        foreach (var elem in stbFigure.Elements(tag))
+                        foreach (XElement elem in stbFigure.Elements(tag))
                         {
                             if ((string)elem.Attribute("pos") == "CENTER")
                             {
@@ -405,6 +451,8 @@ namespace STBReader.Section
                         }
                     }
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -464,13 +512,19 @@ namespace STBReader.Section
                     : KindsBeam.Beam);
             }
             else
+            {
                 KindBeam.Add(KindsBeam.Girder);
-            
+            }
+
             if (stbElem.Attribute("isFoundation") != null)
+            {
                 IsFoundation.Add((bool)stbElem.Attribute("isFoundation"));
+            }
             else
+            {
                 IsFoundation.Add(false);
-            
+            }
+
             var stbBeamSecFigure = new StbBeamSecFigure();
             stbBeamSecFigure.Load(stbElem, version, xmlns);
             Width.Add(stbBeamSecFigure.Width);
@@ -529,7 +583,9 @@ namespace STBReader.Section
                 case StbVersion.Ver2:
                     stbFigure = stbBeam.Element(xmlns + "StbSecFigureBeam_RC");
                     if (stbFigure == null)
+                    {
                         break;
+                    }
 
                     if (stbFigure.Element(xmlns + "StbSecBeam_RC_Straight") != null)
                     {
@@ -540,7 +596,7 @@ namespace STBReader.Section
                     else if (stbFigure.Element(xmlns + "StbSecBeam_RC_Taper") != null)
                     {
                         tag = xmlns + "StbSecBeam_RC_Taper";
-                        foreach (var elem in stbFigure.Elements(tag))
+                        foreach (XElement elem in stbFigure.Elements(tag))
                         {
                             if ((string)elem.Attribute("pos") == "END")
                             {
@@ -552,7 +608,7 @@ namespace STBReader.Section
                     else if (stbFigure.Element(xmlns + "StbSecBeam_RC_Haunch") != null)
                     {
                         tag = xmlns + "StbSecBeam_RC_Haunch";
-                        foreach (var elem in stbFigure.Elements(tag))
+                        foreach (XElement elem in stbFigure.Elements(tag))
                         {
                             if ((string)elem.Attribute("pos") == "CENTER")
                             {
@@ -566,8 +622,9 @@ namespace STBReader.Section
                         Width = 0;
                         Depth = 0;
                     }
-
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -585,69 +642,112 @@ namespace STBReader.Section
             {
                 case StbVersion.Ver1:
                     string elementName;
-                    var stbBar = stbBeam.Element("StbSecBar_Arrangement");
+                    XElement stbBar = stbBeam.Element("StbSecBar_Arrangement");
                     if (stbBar == null)
+                    {
                         break;
+                    }
 
                     if (stbBar.Element("StbSecBeam_Start_Center_End_Section") != null)
+                    {
                         elementName = "StbSecBeam_Start_Center_End_Section";
+                    }
                     else if (stbBar.Element("StbSecBeam_Start_End_Section") != null)
+                    {
                         elementName = "StbSecBeam_Start_End_Section";
+                    }
                     else if (stbBar.Element("StbSecBeam_Same_Section") != null)
+                    {
                         elementName = "StbSecBeam_Same_Section";
+                    }
                     else
                     {
                         BarList.AddRange(new List<double> { 2, 2, 0, 0, 0, 0, 200, 2 });
                         return;
                     }
 
-                    var stbBarElem = stbBar.Element(elementName);
+                    XElement stbBarElem = stbBar.Element(elementName);
                     if (stbBarElem == null)
+                    {
                         break;
+                    }
 
                     // Main 1
                     if (stbBarElem.Attribute("count_main_top_1st") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_top_1st"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_main_bottom_1st") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_bottom_1st"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Main2
                     if (stbBarElem.Attribute("count_main_top_2nd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_top_2nd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_main_bottom_2nd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_bottom_2nd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Main3
                     if (stbBarElem.Attribute("count_main_top_3rd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_top_3rd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_main_bottom_3rd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_bottom_3rd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Band
                     if (stbBarElem.Attribute("pitch_stirrup") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("pitch_stirrup"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_stirrup") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_stirrup"));
+                    }
                     else
+                    {
                         BarList.Add(0);
-                    
+                    }
                     break;
                 case StbVersion.Ver2:
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -689,10 +789,12 @@ namespace STBReader.Section
         public override void Load(XDocument stbData, StbVersion version, string xmlns)
         {
             if (stbData.Root == null)
+            {
                 return;
-            
-            var stbStBeams = stbData.Root.Descendants(xmlns + Tag);
-            foreach (var stbStBeam in stbStBeams)
+            }
+
+            IEnumerable<XElement> stbStBeams = stbData.Root.Descendants(xmlns + Tag);
+            foreach (XElement stbStBeam in stbStBeams)
             {
                 // 必須コード
                 Id.Add((int)stbStBeam.Attribute("id"));
@@ -709,15 +811,9 @@ namespace STBReader.Section
                 }
                 if (stbStBeam.Attribute("kind_beam") != null)
                 {
-                    switch ((string)stbStBeam.Attribute("kind_beam"))
-                    {
-                        case "GIRDER":
-                            KindBeam.Add(KindsBeam.Girder);
-                            break;
-                        default:
-                            KindBeam.Add(KindsBeam.Beam);
-                            break;
-                    }
+                    KindBeam.Add((string) stbStBeam.Attribute("kind_beam") == "GIRDER"
+                        ? KindsBeam.Girder
+                        : KindsBeam.Beam);
                 }
                 else
                 {
@@ -776,79 +872,81 @@ namespace STBReader.Section
             {
                 case StbVersion.Ver1:
                     stbFigure = stbStBeam.Element("StbSecSteelBeam");
-                    if (stbFigure == null)
-                        break;
+                    if (stbFigure != null)
+                    {
+                        Pos = (string) stbFigure.Attribute("pos");
+                        Shape = (string) stbFigure.Attribute("shape");
+                        StrengthMain = (string) stbFigure.Attribute("strength_main");
 
-                    // 必須コード
-                    Pos = (string)stbFigure.Attribute("pos");
-                    Shape = (string)stbFigure.Attribute("shape");
-                    StrengthMain = (string)stbFigure.Attribute("strength_main");
-
-                    // 必須ではないコード
-                    if (stbFigure.Attribute("strength_web") != null)
-                        StrengthWeb = (string)stbFigure.Attribute("strength_web");
-                    else
-                        StrengthWeb = string.Empty;
-                    
+                        // 必須ではないコード
+                        StrengthWeb = stbFigure.Attribute("strength_web") != null
+                            ? (string) stbFigure.Attribute("strength_web")
+                            : string.Empty;
+                    }
                     break;
                 case StbVersion.Ver2:
-                    string tag;
                     stbFigure = stbStBeam.Element(xmlns + "StbSecSteelFigureBeam_S");
-                    if (stbFigure == null)
-                        break;
-
-                    if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Straight") != null)
+                    if (stbFigure != null)
                     {
-                        tag = xmlns + "StbSecSteelBeam_S_Straight";
-                        Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                        StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                    }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Taper") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_Taper";
-                        foreach (var elem in stbFigure.Elements(tag))
+                        string tag;
+                        if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Straight") != null)
                         {
-                            if ((string) elem.Attribute("pos") != "END")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
+                            tag = xmlns + "StbSecSteelBeam_S_Straight";
+                            Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                            StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Taper") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_Taper";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "END")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Joint") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_Joint";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "CENTER")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Haunch") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_Haunch";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "CENTER")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_FiveTypes") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_FiveTypes";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "CENTER")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
                         }
                     }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Joint") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_Joint";
-                        foreach (var elem in stbFigure.Elements(tag))
-                        {
-                            if ((string) elem.Attribute("pos") != "CENTER")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                        }
-                    }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Haunch") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_Haunch";
-                        foreach (var elem in stbFigure.Elements(tag))
-                        {
-                            if ((string) elem.Attribute("pos") != "CENTER")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                        }
-                    }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_FiveTypes") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_FiveTypes";
-                        foreach (var elem in stbFigure.Elements(tag))
-                        {
-                            if ((string) elem.Attribute("pos") != "CENTER")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                        }
-                    }
-
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -880,10 +978,12 @@ namespace STBReader.Section
         public override void Load(XDocument stbData, StbVersion version, string xmlns)
         {
             if (stbData.Root == null)
+            {
                 return;
-            
-            var stbStBraces = stbData.Root.Descendants(xmlns + Tag);
-            foreach (var stbStBrace in stbStBraces)
+            }
+
+            IEnumerable<XElement> stbStBraces = stbData.Root.Descendants(xmlns + Tag);
+            foreach (XElement stbStBrace in stbStBraces)
             {
                 // 必須コード
                 Id.Add((int)stbStBrace.Attribute("id"));
@@ -900,15 +1000,9 @@ namespace STBReader.Section
                 }
                 if (stbStBrace.Attribute("kind_brace") != null)
                 {
-                    switch ((string)stbStBrace.Attribute("kind_brace"))
-                    {
-                        case "HORIZONTAL":
-                            KindBrace.Add(KindsBrace.Horizontal);
-                            break;
-                        default:
-                            KindBrace.Add(KindsBrace.Vertical);
-                            break;
-                    }
+                    KindBrace.Add((string) stbStBrace.Attribute("kind_brace") == "HORIZONTAL"
+                        ? KindsBrace.Horizontal
+                        : KindsBrace.Vertical);
                 }
                 else
                 {
@@ -942,7 +1036,9 @@ namespace STBReader.Section
                 case StbVersion.Ver1:
                     stbFigure = stbStBrace.Element("StbSecSteelBrace");
                     if (stbFigure == null)
+                    {
                         break;
+                    }
 
                     // 必須コード
                     Pos = (string)stbFigure.Attribute("pos");
@@ -951,16 +1047,22 @@ namespace STBReader.Section
 
                     // 必須ではないコード
                     if (stbFigure.Attribute("strength_web") != null)
+                    {
                         StrengthWeb = (string)stbFigure.Attribute("strength_web");
+                    }
                     else
+                    {
                         StrengthWeb = string.Empty;
-                    
+                    }
+
                     break;
                 case StbVersion.Ver2:
                     string tag;
                     stbFigure = stbStBrace.Element(xmlns + "StbSecSteelFigureBrace_S");
                     if (stbFigure == null)
+                    {
                         break;
+                    }
 
                     if (stbFigure.Element(xmlns + "StbSecSteelBrace_S_Same") != null)
                     {
@@ -986,8 +1088,9 @@ namespace STBReader.Section
                             StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
                         }
                     }
-                    
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
         }
     }
@@ -1016,16 +1119,8 @@ namespace STBReader.Section
     /// <summary>
     /// 鉄骨断面
     /// </summary>
-    public class StbSecSteel : StbBase
+    public class StbSecSteel : StbSteelParameters
     {
-        public List<double> P1 { get; } = new List<double>();
-        public List<double> P2 { get; } = new List<double>();
-        public List<double> P3 { get; } = new List<double>();
-        public List<double> P4 { get; } = new List<double>();
-        public List<double> P5 { get; } = new List<double>();
-        public List<double> P6 { get; } = new List<double>();
-        public List<ShapeTypes> ShapeType { get; } = new List<ShapeTypes>();
-
         private StbSecRollH RollH { get; } = new StbSecRollH();
         private StbSecBuildH BuildH { get; } = new StbSecBuildH();
         private StbSecRollBox RollBox { get; } = new StbSecRollBox();
@@ -1051,7 +1146,7 @@ namespace STBReader.Section
                 RollH, BuildH, RollBox, BuildBox, Pipe, RollT, RollC, RollL, RollLipC, FlatBar, RoundBar
             };
 
-            foreach (var section in sections)
+            foreach (StbSteelParameters section in sections)
             {
                 section.Load(stbData, version, xmlns);
                 Name.AddRange(section.Name);
@@ -1125,6 +1220,8 @@ namespace STBReader.Section
                 case StbVersion.Ver2:
                     P4.Add((float) stbElem.Attribute("r"));
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
             P5.Add(-1d);
             P6.Add(-1d);
@@ -1272,10 +1369,12 @@ namespace STBReader.Section
         public override void Load(XDocument stbData, StbVersion version, string xmlns)
         {
             if (stbData.Root == null)
-                return;    
-            
+            {
+                return;
+            }
+
             IEnumerable<XElement> stSections  = null;
-            var stSecSteel = stbData.Root.Descendants(xmlns + Tag);
+            IEnumerable<XElement> stSecSteel = stbData.Root.Descendants(xmlns + Tag);
             switch (version)
             {
                 case StbVersion.Ver1:
@@ -1284,13 +1383,14 @@ namespace STBReader.Section
                 case StbVersion.Ver2:
                     stSections = stSecSteel.Elements(xmlns + "StbSecFlatBar");
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
-
-            if (stSections == null)
-                return;
             
-            foreach (var stSection in stSections)
+            foreach (XElement stSection in stSections)
+            {
                 ElementLoader(stSection, version, xmlns);
+            }
         }
     }
 
@@ -1314,10 +1414,12 @@ namespace STBReader.Section
         public override void Load(XDocument stbData, StbVersion version, string xmlns)
         {
             if (stbData.Root == null)
+            {
                 return;
-            
+            }
+
             IEnumerable<XElement> stSections  = null;
-            var stSecSteel = stbData.Root.Descendants(xmlns + Tag);
+            IEnumerable<XElement> stSecSteel = stbData.Root.Descendants(xmlns + Tag);
 
             switch (version)
             {
@@ -1327,13 +1429,14 @@ namespace STBReader.Section
                 case StbVersion.Ver2:
                     stSections = stSecSteel.Elements(xmlns + "StbSecRoundBar");
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
             }
 
-            if (stSections == null)
-                return;
-            
-            foreach (var stSection in stSections)
+            foreach (XElement stSection in stSections)
+            {
                 ElementLoader(stSection, version, xmlns);
+            }
         }
     }
 }
