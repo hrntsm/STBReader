@@ -137,7 +137,9 @@ namespace STBReader.Section
                     string elementName;
                     XElement stbBar = stbColumn.Element("StbSecBar_Arrangement");
                     if (stbBar == null)
+                    {
                         break;
+                    }
 
                     if (stbBar.Element("StbSecRect_Column_Same") != null)
                     {
@@ -666,7 +668,9 @@ namespace STBReader.Section
 
                     XElement stbBarElem = stbBar.Element(elementName);
                     if (stbBarElem == null)
+                    {
                         break;
+                    }
 
                     // Main 1
                     if (stbBarElem.Attribute("count_main_top_1st") != null)
