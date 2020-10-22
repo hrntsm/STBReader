@@ -45,27 +45,27 @@ namespace STBReader
         }
     }
 
-    public readonly struct Point : IEquatable<Point>
+    public readonly struct Point3 : IEquatable<Point3>
     {
-        private double X { get; }
-        private double Y { get; }
-        private double Z { get; }
+        public double X { get; }
+        public double Y { get; }
+        public double Z { get; }
 
-        public Point(double x, double y, double z)
+        public Point3(double x, double y, double z)
         {
             X = x;
             Y = y;
             Z = z;
         }
 
-        public bool Equals(Point other)
+        public bool Equals(Point3 other)
         {
             return X.Equals(other.X) && Y.Equals(other.Y) && Z.Equals(other.Z);
         }
 
         public override bool Equals(object obj)
         {
-            return obj is Point other && Equals(other);
+            return obj is Point3 other && Equals(other);
         }
 
         public override int GetHashCode()
