@@ -13,10 +13,8 @@ The documentation for this library can be found at the following link.
 ## Use cases
 
 Two software programs have been created that use this library.
-
 + For Grasshopper in Rhinoceros
     + [HoaryFox](https://github.com/hrntsm/HoaryFox)
-    
 + Applications for Windows made with Unity
     + [STEVIA](https://github.com/hrntsm/STEVIA-Stb2U)
 
@@ -25,20 +23,17 @@ Two software programs have been created that use this library.
 Quote from [building SMART Japan Structural Design Subcommittee](https://en.building-smart.or.jp/meeting/buildall/structural-design/) doing making specifications of ST-Bridge.
 
 > ST Bridge is the standardized format for data sharing in Japan’s structural engineering industry.
->   + Simpler to use than IFC due to the clearly defined the range of use
->   + Integrate Japanese original methods of drawing methodology (Grids, part placement and section annotations, reinforcement information)
->   + Aim for coordination between domestic structural applications, building skeleton surveying applications, 3D Object CAD
+> + Simpler to use than IFC due to the clearly defined the range of use
+> + Integrate Japanese original methods of drawing methodology (Grids, part placement and section annotations, reinforcement information)
+> + Aim for coordination between domestic structural applications, building skeleton surveying applications, 3D Object CAD
 
 ## Contact information
 
 [![Twitter](https://img.shields.io/twitter/follow/hiron_rgkr?style=social)](https://twitter.com/hiron_rgkr)
- 
-  + HP : [https://hrntsm.github.io//](https://hrntsm.github.io/)
- 
-  + blog : [https://rgkr-memo.blogspot.com/](https://rgkr-memo.blogspot.com/)
-  
-  + Mail : support(at)hrntsm.com
-      + change (at) to @
+ + HP : [https://hrntsm.github.io//](https://hrntsm.github.io/)
+ + blog : [https://rgkr-memo.blogspot.com/](https://rgkr-memo.blogspot.com/)
+ + Mail : support(at)hrntsm.com
+    + change (at) to @
   
 ## License
 
