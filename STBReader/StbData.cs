@@ -59,7 +59,7 @@ namespace STBReader
                         _version = StbVersion.Ver2;
                         break;
                     default:
-                        throw new Exception("The STB version is not set");
+                        throw new ArgumentException("The STB version is not set");
                 }
             }
             Init();

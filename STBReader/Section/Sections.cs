@@ -177,7 +177,7 @@ namespace STBReader.Section
                         BarList.Add(0);
                     }
 
-                    if (stbBarElem.Attribute("count_main_X_1st") != null)
+                    if (stbBarElem.Attribute("count_main_Y_1st") != null)
                     {
                         BarList.Add((double)stbBarElem.Attribute("count_main_Y_1st"));
                     }
@@ -309,15 +309,9 @@ namespace STBReader.Section
                 }
                 if (stbStCol.Attribute("kind_column") != null)
                 {
-                    switch ((string)stbStCol.Attribute("kind_column"))
-                    {
-                        case "COLUMN":
-                            KindColumn.Add(KindsColumn.Column);
-                            break;
-                        default:
-                            KindColumn.Add(KindsColumn.Post);
-                            break;
-                    }
+                    KindColumn.Add((string) stbStCol.Attribute("kind_column") == "COLUMN"
+                        ? KindsColumn.Column
+                        : KindsColumn.Post);
                 }
                 else
                 {
@@ -335,6 +329,9 @@ namespace STBReader.Section
                             break;
                         case "WRAP":
                             BaseType.Add(BaseTypes.Wrap);
+                            break;
+                        default:
+                            BaseType.Add(BaseTypes.Any);
                             break;
                     }
                 }
@@ -414,8 +411,10 @@ namespace STBReader.Section
                     string tag;
                     stbFigure = stbStCol.Element(xmlns + "StbSecSteelFigureColumn_S");
                     if (stbFigure == null)
+                    {
                         break;
-                    
+                    }
+
                     if (stbFigure.Element(xmlns + "StbSecSteelColumn_S_Same") != null)
                     {
                         tag = xmlns + "StbSecSteelColumn_S_Same";
@@ -641,66 +640,105 @@ namespace STBReader.Section
             {
                 case StbVersion.Ver1:
                     string elementName;
-                    var stbBar = stbBeam.Element("StbSecBar_Arrangement");
+                    XElement stbBar = stbBeam.Element("StbSecBar_Arrangement");
                     if (stbBar == null)
+                    {
                         break;
+                    }
 
                     if (stbBar.Element("StbSecBeam_Start_Center_End_Section") != null)
+                    {
                         elementName = "StbSecBeam_Start_Center_End_Section";
+                    }
                     else if (stbBar.Element("StbSecBeam_Start_End_Section") != null)
+                    {
                         elementName = "StbSecBeam_Start_End_Section";
+                    }
                     else if (stbBar.Element("StbSecBeam_Same_Section") != null)
+                    {
                         elementName = "StbSecBeam_Same_Section";
+                    }
                     else
                     {
                         BarList.AddRange(new List<double> { 2, 2, 0, 0, 0, 0, 200, 2 });
                         return;
                     }
 
-                    var stbBarElem = stbBar.Element(elementName);
+                    XElement stbBarElem = stbBar.Element(elementName);
                     if (stbBarElem == null)
                         break;
 
                     // Main 1
                     if (stbBarElem.Attribute("count_main_top_1st") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_top_1st"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_main_bottom_1st") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_bottom_1st"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Main2
                     if (stbBarElem.Attribute("count_main_top_2nd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_top_2nd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_main_bottom_2nd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_bottom_2nd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Main3
                     if (stbBarElem.Attribute("count_main_top_3rd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_top_3rd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_main_bottom_3rd") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_main_bottom_3rd"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
 
                     // Band
                     if (stbBarElem.Attribute("pitch_stirrup") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("pitch_stirrup"));
+                    }
                     else
+                    {
                         BarList.Add(0);
+                    }
                     if (stbBarElem.Attribute("count_stirrup") != null)
+                    {
                         BarList.Add((double)stbBarElem.Attribute("count_stirrup"));
+                    }
                     else
+                    {
                         BarList.Add(0);
-                    
+                    }
                     break;
                 case StbVersion.Ver2:
                     break;
@@ -769,15 +807,9 @@ namespace STBReader.Section
                 }
                 if (stbStBeam.Attribute("kind_beam") != null)
                 {
-                    switch ((string)stbStBeam.Attribute("kind_beam"))
-                    {
-                        case "GIRDER":
-                            KindBeam.Add(KindsBeam.Girder);
-                            break;
-                        default:
-                            KindBeam.Add(KindsBeam.Beam);
-                            break;
-                    }
+                    KindBeam.Add((string) stbStBeam.Attribute("kind_beam") == "GIRDER"
+                        ? KindsBeam.Girder
+                        : KindsBeam.Beam);
                 }
                 else
                 {
@@ -836,78 +868,78 @@ namespace STBReader.Section
             {
                 case StbVersion.Ver1:
                     stbFigure = stbStBeam.Element("StbSecSteelBeam");
-                    if (stbFigure == null)
-                        break;
+                    if (stbFigure != null)
+                    {
+                        Pos = (string) stbFigure.Attribute("pos");
+                        Shape = (string) stbFigure.Attribute("shape");
+                        StrengthMain = (string) stbFigure.Attribute("strength_main");
 
-                    // 必須コード
-                    Pos = (string)stbFigure.Attribute("pos");
-                    Shape = (string)stbFigure.Attribute("shape");
-                    StrengthMain = (string)stbFigure.Attribute("strength_main");
-
-                    // 必須ではないコード
-                    if (stbFigure.Attribute("strength_web") != null)
-                        StrengthWeb = (string)stbFigure.Attribute("strength_web");
-                    else
-                        StrengthWeb = string.Empty;
-                    
+                        // 必須ではないコード
+                        StrengthWeb = stbFigure.Attribute("strength_web") != null
+                            ? (string) stbFigure.Attribute("strength_web")
+                            : string.Empty;
+                    }
                     break;
                 case StbVersion.Ver2:
-                    string tag;
                     stbFigure = stbStBeam.Element(xmlns + "StbSecSteelFigureBeam_S");
-                    if (stbFigure == null)
-                        break;
-
-                    if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Straight") != null)
+                    if (stbFigure != null)
                     {
-                        tag = xmlns + "StbSecSteelBeam_S_Straight";
-                        Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                        StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                    }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Taper") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_Taper";
-                        foreach (var elem in stbFigure.Elements(tag))
+                        string tag;
+                        if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Straight") != null)
                         {
-                            if ((string) elem.Attribute("pos") != "END")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
+                            tag = xmlns + "StbSecSteelBeam_S_Straight";
+                            Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                            StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Taper") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_Taper";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "END")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Joint") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_Joint";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "CENTER")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Haunch") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_Haunch";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "CENTER")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
+                        }
+                        else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_FiveTypes") != null)
+                        {
+                            tag = xmlns + "StbSecSteelBeam_S_FiveTypes";
+                            foreach (XElement elem in stbFigure.Elements(tag))
+                            {
+                                if ((string) elem.Attribute("pos") == "CENTER")
+                                {
+                                    Shape = (string) stbFigure.Element(tag)?.Attribute("shape");
+                                    StrengthMain = (string) stbFigure.Element(tag)?.Attribute("strength_main");
+                                }
+                            }
                         }
                     }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Joint") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_Joint";
-                        foreach (var elem in stbFigure.Elements(tag))
-                        {
-                            if ((string) elem.Attribute("pos") != "CENTER")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                        }
-                    }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_Haunch") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_Haunch";
-                        foreach (var elem in stbFigure.Elements(tag))
-                        {
-                            if ((string) elem.Attribute("pos") != "CENTER")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                        }
-                    }
-                    else if (stbFigure.Element(xmlns + "StbSecSteelBeam_S_FiveTypes") != null)
-                    {
-                        tag = xmlns + "StbSecSteelBeam_S_FiveTypes";
-                        foreach (var elem in stbFigure.Elements(tag))
-                        {
-                            if ((string) elem.Attribute("pos") != "CENTER")
-                                continue;
-                            Shape = (string)stbFigure.Element(tag)?.Attribute("shape");
-                            StrengthMain = (string)stbFigure.Element(tag)?.Attribute("strength_main");
-                        }
-                    }
-
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(version), version, "The STB version is not set");
@@ -964,15 +996,9 @@ namespace STBReader.Section
                 }
                 if (stbStBrace.Attribute("kind_brace") != null)
                 {
-                    switch ((string)stbStBrace.Attribute("kind_brace"))
-                    {
-                        case "HORIZONTAL":
-                            KindBrace.Add(KindsBrace.Horizontal);
-                            break;
-                        default:
-                            KindBrace.Add(KindsBrace.Vertical);
-                            break;
-                    }
+                    KindBrace.Add((string) stbStBrace.Attribute("kind_brace") == "HORIZONTAL"
+                        ? KindsBrace.Horizontal
+                        : KindsBrace.Vertical);
                 }
                 else
                 {
