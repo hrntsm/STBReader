@@ -69,8 +69,7 @@ namespace STBReader
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                throw new ArgumentException(e.Message);
             }
         }
         
